@@ -43,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
         note.put(KEY_TITLE, title);
         note.put(KEY_DESCRIPTION, description);
 
+        //Can Replace With this 2 Lines
         //db.document("Notebook/My First Note")
         //db.collection("Notebook").document("My First Note").set(note)
         db.collection("Notebook").document("My First Note").set(note)
