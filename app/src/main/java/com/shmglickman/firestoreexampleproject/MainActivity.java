@@ -14,9 +14,11 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.SetOptions;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -69,6 +71,8 @@ public class MainActivity extends AppCompatActivity {
                     String description = documentSnapshot.getString(KEY_DESCRIPTION);
 
                     textViewData.setText("Title: " + title + "\n" + "Description" + description);
+                } else {
+                    textViewData.setText("");
                 }
             }
         });
@@ -106,7 +110,33 @@ public class MainActivity extends AppCompatActivity {
                         Log.d(TAG, e.toString());
                     }
                 });
+    }
 
+
+    public void updateDescription(View view) {
+        String description = editTextDescription.getText().toString();
+
+        //-->Map<String, Object> note = new HashMap<>();
+        //-->note.put(KEY_DESCRIPTION, description);
+
+        //-->noteRef.set(note, SetOptions.merge());
+
+        // The command line below after deleting the document does not produce a new document.
+        //noteRef.update(note);
+        // OR
+        noteRef.update(KEY_DESCRIPTION, description);
+    }
+
+    public void deleteDescription(View view) {
+        //Map<String, Object> note = new HashMap<>();
+        //note.put(KEY_DESCRIPTION, FieldValue.delete());
+
+        //noteRef.update(note);
+        noteRef.update(KEY_DESCRIPTION, FieldValue.delete());
+    }
+
+    public void deleteNote(View view) {
+        noteRef.delete();
     }
 
     public void loadNote(View view) {
@@ -134,6 +164,7 @@ public class MainActivity extends AppCompatActivity {
                         Log.d(TAG, e.toString());
                     }
                 });
-
     }
+
+
 }
