@@ -67,10 +67,20 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 if (documentSnapshot.exists()) {
-                    String title = documentSnapshot.getString(KEY_TITLE);
-                    String description = documentSnapshot.getString(KEY_DESCRIPTION);
 
-                    textViewData.setText("Title: " + title + "\n" + "Description" + description);
+//                    When we are working without an object only with HashMap
+//                    String title = documentSnapshot.getString(KEY_TITLE);
+//                    String description = documentSnapshot.getString(KEY_DESCRIPTION);
+//
+//                    textViewData.setText("Title: " + title + "\n" + "Description" + description);
+
+//                  When we are working with an object Name Note constructor
+                    Note note = documentSnapshot.toObject(Note.class);
+
+                    String title = note.getTitle();
+                    String description = note.getDescription();
+
+                    textViewData.setText("Title: " +  title + "\n" + "Description" + description);
                 } else {
                     textViewData.setText("");
                 }
@@ -88,9 +98,13 @@ public class MainActivity extends AppCompatActivity {
         String title = editTextTitle.getText().toString();
         String description = editTextDescription.getText().toString();
 
-        Map<String, Object> note = new HashMap<>();
-        note.put(KEY_TITLE, title);
-        note.put(KEY_DESCRIPTION, description);
+//      When we are working without an object only with HashMap
+//        Map<String, Object> note = new HashMap<>();
+//        note.put(KEY_TITLE, title);
+//
+
+//      When we are working with an object Name Note constructor
+        Note note = new Note(title, description);
 
         //Can Replace With this 2 Lines
         //db.document("Notebook/My First Note")
@@ -145,10 +159,18 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
                         if (documentSnapshot.exists()) {
-                            String title = documentSnapshot.getString(KEY_TITLE);
-                            String description = documentSnapshot.getString(KEY_DESCRIPTION);
+
+//                            When we are working without an object only with HashMap
+//                            String title = documentSnapshot.getString(KEY_TITLE);
+//                            String description = documentSnapshot.getString(KEY_DESCRIPTION);
 
                             //Map<String, Object> note = documentSnapshot.getData();
+
+//                          When we are working with an object Name Note constructor
+                            Note note = documentSnapshot.toObject(Note.class);
+
+                            String title = note.getTitle();
+                            String description = note.getDescription();
 
                             textViewData.setText("Title: " +  title + "\n" + "Description" + description);
                         } else {
