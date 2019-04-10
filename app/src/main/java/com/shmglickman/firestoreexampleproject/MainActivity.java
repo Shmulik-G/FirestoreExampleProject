@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -18,6 +19,8 @@ import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
 
 import java.util.HashMap;
@@ -28,14 +31,16 @@ import javax.annotation.Nullable;
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
 
-    private static  final String KEY_TITLE = "title";
-    private static  final String KEY_DESCRIPTION = "description";
+    private static final String KEY_TITLE = "title";
+    private static final String KEY_DESCRIPTION = "description";
 
     private EditText editTextTitle;
     private EditText editTextDescription;
     private TextView textViewData;
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+    private CollectionReference noteBookRef = db.collection("Notebook");
 
     private DocumentReference noteRef = db.document("Notebook/My First Note");
     // Or Can Write This
@@ -57,11 +62,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         noteRef.addSnapshotListener(this, new EventListener<DocumentSnapshot>() {
-//        noteListener = noteRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            //        noteListener = noteRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
                 if (e != null) {
-                    Toast.makeText(MainActivity.this, "Error while loading",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "Error while loading", Toast.LENGTH_SHORT).show();
                     Log.d(TAG, e.toString());
                     return;
                 }
@@ -80,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
                     String title = note.getTitle();
                     String description = note.getDescription();
 
-                    textViewData.setText("Title: " +  title + "\n" + "Description" + description);
+                    textViewData.setText("Title: " + title + "\n" + "Description" + description);
                 } else {
                     textViewData.setText("");
                 }
@@ -172,7 +177,7 @@ public class MainActivity extends AppCompatActivity {
                             String title = note.getTitle();
                             String description = note.getDescription();
 
-                            textViewData.setText("Title: " +  title + "\n" + "Description" + description);
+                            textViewData.setText("Title: " + title + "\n" + "Description" + description);
                         } else {
                             Toast.makeText(MainActivity.this, "Document does not exist", Toast.LENGTH_SHORT).show();
                         }
@@ -184,6 +189,63 @@ public class MainActivity extends AppCompatActivity {
                     public void onFailure(@NonNull Exception e) {
                         Toast.makeText(MainActivity.this, "Error!", Toast.LENGTH_SHORT).show();
                         Log.d(TAG, e.toString());
+                    }
+                });
+    }
+
+
+    public void addNote(View v) {
+        String title = editTextTitle.getText().toString();
+        String description = editTextDescription.getText().toString();
+
+//      When we are working without an object only with HashMap
+//        Map<String, Object> note = new HashMap<>();
+//        note.put(KEY_TITLE, title);
+//
+
+//      When we are working with an object Name Note constructor
+        Note note = new Note(title, description);
+
+        // noteBookRef.add(note);
+        //Can Replace With this 2 Lines
+        //db.document("Notebook/My First Note")
+        //db.collection("Notebook").document("My First Note").set(note)
+        //db.collection("Notebook").document("My First Note").set(note)
+        // noteRef.set(note)
+        noteBookRef.add(note)
+                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    @Override
+                    public void onSuccess(DocumentReference documentReference) {
+                        Toast.makeText(MainActivity.this, "Note saved", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(MainActivity.this, "Error!", Toast.LENGTH_SHORT).show();
+                        Log.d(TAG, e.toString());
+                    }
+                });
+    }
+
+
+    public void loadNotes(View view) {
+        noteBookRef.get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        String data = "";
+
+                        for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                            Note note = documentSnapshot.toObject(Note.class);
+
+                            String title = note.getTitle();
+                            String description = note.getDescription();
+
+                            data += "Title: " + title + "\nDescription: " + description + "\n\n";
+                        }
+
+                        textViewData.setText(data);
                     }
                 });
     }
