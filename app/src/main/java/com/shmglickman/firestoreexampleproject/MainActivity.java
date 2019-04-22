@@ -61,34 +61,61 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        noteRef.addSnapshotListener(this, new EventListener<DocumentSnapshot>() {
-            //        noteListener = noteRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+//        noteRef.addSnapshotListener(this, new EventListener<DocumentSnapshot>() {
+//            //        noteListener = noteRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+//            @Override
+//            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+//                if (e != null) {
+//                    Toast.makeText(MainActivity.this, "Error while loading", Toast.LENGTH_SHORT).show();
+//                    Log.d(TAG, e.toString());
+//                    return;
+//                }
+//
+//                if (documentSnapshot.exists()) {
+//
+////                    When we are working without an object only with HashMap
+////                    String title = documentSnapshot.getString(KEY_TITLE);
+////                    String description = documentSnapshot.getString(KEY_DESCRIPTION);
+////
+////                    textViewData.setText("Title: " + title + "\n" + "Description" + description);
+//
+////                  When we are working with an object Name Note constructor
+//                    Note note = documentSnapshot.toObject(Note.class);
+//
+//                    String title = note.getTitle();
+//                    String description = note.getDescription();
+//
+//                    textViewData.setText("Title: " + title + "\n" + "Description" + description);
+//                } else {
+//                    textViewData.setText("");
+//                }
+//            }
+//        }
+
+        noteBookRef.addSnapshotListener(this, new EventListener<QuerySnapshot>() {
             @Override
-            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
                 if (e != null) {
-                    Toast.makeText(MainActivity.this, "Error while loading", Toast.LENGTH_SHORT).show();
-                    Log.d(TAG, e.toString());
                     return;
                 }
 
-                if (documentSnapshot.exists()) {
+                String data = "";
 
-//                    When we are working without an object only with HashMap
-//                    String title = documentSnapshot.getString(KEY_TITLE);
-//                    String description = documentSnapshot.getString(KEY_DESCRIPTION);
-//
-//                    textViewData.setText("Title: " + title + "\n" + "Description" + description);
-
-//                  When we are working with an object Name Note constructor
+                for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
                     Note note = documentSnapshot.toObject(Note.class);
+                    note.setDocumentId(documentSnapshot.getId());
 
+                    String  documentId = note.getDocumentId();
                     String title = note.getTitle();
                     String description = note.getDescription();
 
-                    textViewData.setText("Title: " + title + "\n" + "Description" + description);
-                } else {
-                    textViewData.setText("");
+                    data += "ID: " + documentId
+                            + "\nTitle: " + title + "\nDescription: " + description + "\n\n";
+
+                    //noteBookRef.document(documentId).delete();
                 }
+
+                textViewData.setText(data);
             }
         });
     }
@@ -230,6 +257,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void loadNotes(View view) {
+        // For Read and Load All Multiply Notes
         noteBookRef.get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
@@ -238,11 +266,14 @@ public class MainActivity extends AppCompatActivity {
 
                         for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
                             Note note = documentSnapshot.toObject(Note.class);
+                            note.setDocumentId(documentSnapshot.getId());
 
+                            String  documentId = note.getDocumentId();
                             String title = note.getTitle();
                             String description = note.getDescription();
 
-                            data += "Title: " + title + "\nDescription: " + description + "\n\n";
+                            data += "ID: " + documentId
+                                    + "\nTitle: " + title + "\nDescription: " + description + "\n\n";
                         }
 
                         textViewData.setText(data);
