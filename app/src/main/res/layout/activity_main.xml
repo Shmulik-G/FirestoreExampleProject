@@ -22,47 +22,57 @@
         android:hint="Description"
         android:inputType="text"/>
 
+    <EditText
+        android:id="@+id/edit_text_priority"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Priority"
+        android:inputType="number"/>
+
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Save"
+        android:text="Save My First Note"
         android:onClick="saveNote"/>
 
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Load"
+        android:text="Load My First Note"
         android:onClick="loadNote"/>
 
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Update Description"
+        android:textAllCaps="false"
+        android:text="Update Description From My First Note"
         android:onClick="updateDescription"/>
 
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Delete Description"
+        android:textAllCaps="false"
+        android:text="Delete Description From My First Note"
         android:onClick="deleteDescription"/>
 
    <Button
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
-       android:text="Delete Note"
+       android:text="Delete Note --> My First Note"
        android:onClick="deleteNote"/>
 
 
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Add Note"
+        android:text="Add New Note"
         android:onClick="addNote"/>
 
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Load Notes"
+        android:textAllCaps="false"
+        android:text="Load Notes 3 Docs In Collection Notebook"
         android:onClick="loadNotes"/>
 
     <android.support.v4.widget.NestedScrollView

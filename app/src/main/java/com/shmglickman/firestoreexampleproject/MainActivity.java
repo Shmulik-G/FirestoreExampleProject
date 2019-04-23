@@ -19,6 +19,7 @@ import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
@@ -36,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
 
     private EditText editTextTitle;
     private EditText editTextDescription;
+    private EditText editTextPriority;
     private TextView textViewData;
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -55,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
 
         editTextTitle = findViewById(R.id.edit_text_title);
         editTextDescription = findViewById(R.id.edit_text_description);
+        editTextPriority = findViewById(R.id.edit_text_priority);
         textViewData = findViewById(R.id.text_view_data);
     }
 
@@ -108,9 +111,11 @@ public class MainActivity extends AppCompatActivity {
                     String  documentId = note.getDocumentId();
                     String title = note.getTitle();
                     String description = note.getDescription();
+                    int priority = note.getPriority();
 
                     data += "ID: " + documentId
-                            + "\nTitle: " + title + "\nDescription: " + description + "\n\n";
+                            + "\nTitle: " + title + "\nDescription: " + description
+                            + "\nPriority: " + priority + "\n\n";
 
                     //noteBookRef.document(documentId).delete();
                 }
@@ -130,13 +135,20 @@ public class MainActivity extends AppCompatActivity {
         String title = editTextTitle.getText().toString();
         String description = editTextDescription.getText().toString();
 
+        if (editTextPriority.length() == 0) {
+            editTextPriority.setText("0");
+        }
+
+        int priority = Integer.parseInt(editTextPriority.getText().toString());
+
 //      When we are working without an object only with HashMap
 //        Map<String, Object> note = new HashMap<>();
 //        note.put(KEY_TITLE, title);
 //
 
 //      When we are working with an object Name Note constructor
-        Note note = new Note(title, description);
+        Note note = new Note(title, description, priority);
+
 
         //Can Replace With this 2 Lines
         //db.document("Notebook/My First Note")
@@ -201,10 +213,21 @@ public class MainActivity extends AppCompatActivity {
 //                          When we are working with an object Name Note constructor
                             Note note = documentSnapshot.toObject(Note.class);
 
+                            note.setDocumentId(documentSnapshot.getId());
+
+                            String data = "";
+
+                            String documentId = note.getDocumentId();
                             String title = note.getTitle();
                             String description = note.getDescription();
 
-                            textViewData.setText("Title: " + title + "\n" + "Description" + description);
+                            int priority = note.getPriority();
+
+                            data += "ID: " + documentId
+                                    + "\nTitle: " + title + "\nDescription: " + description
+                                    + "\nPriority: " + priority + "\n\n";
+                            textViewData.setText(data);
+                            //textViewData.setText("Title: " + title + "\n" + "Description" + description);
                         } else {
                             Toast.makeText(MainActivity.this, "Document does not exist", Toast.LENGTH_SHORT).show();
                         }
@@ -225,13 +248,19 @@ public class MainActivity extends AppCompatActivity {
         String title = editTextTitle.getText().toString();
         String description = editTextDescription.getText().toString();
 
+        if (editTextPriority.length() == 0) {
+            editTextPriority.setText("0");
+        }
+
+        int priority = Integer.parseInt(editTextPriority.getText().toString());
+
 //      When we are working without an object only with HashMap
 //        Map<String, Object> note = new HashMap<>();
 //        note.put(KEY_TITLE, title);
 //
 
 //      When we are working with an object Name Note constructor
-        Note note = new Note(title, description);
+        Note note = new Note(title, description, priority);
 
         // noteBookRef.add(note);
         //Can Replace With this 2 Lines
@@ -258,7 +287,10 @@ public class MainActivity extends AppCompatActivity {
 
     public void loadNotes(View view) {
         // For Read and Load All Multiply Notes
-        noteBookRef.get()
+        noteBookRef.whereGreaterThanOrEqualTo("priority", 2)
+                .orderBy("priority", Query.Direction.DESCENDING)
+                .limit(3)
+                .get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
@@ -268,12 +300,14 @@ public class MainActivity extends AppCompatActivity {
                             Note note = documentSnapshot.toObject(Note.class);
                             note.setDocumentId(documentSnapshot.getId());
 
-                            String  documentId = note.getDocumentId();
+                            String documentId = note.getDocumentId();
                             String title = note.getTitle();
                             String description = note.getDescription();
+                            int priority = note.getPriority();
 
                             data += "ID: " + documentId
-                                    + "\nTitle: " + title + "\nDescription: " + description + "\n\n";
+                                    + "\nTitle: " + title + "\nDescription: " + description
+                                    + "\nPriority: " + priority + "\n\n";
                         }
 
                         textViewData.setText(data);

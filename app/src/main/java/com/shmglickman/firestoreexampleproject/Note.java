@@ -11,9 +11,17 @@ public class Note {
     private String documentId;
     private String title;
     private String description;
+    private int priority;
 
     public Note() {
         //public no-arg constructor needed
+    }
+
+
+    public Note(String title, String description, int priority) {
+        this.title = title;
+        this.description = description;
+        this.priority = priority;
     }
 
     @Exclude
@@ -25,11 +33,6 @@ public class Note {
         this.documentId = documentId;
     }
 
-    public Note(String title, String description) {
-        this.title = title;
-        this.description = description;
-    }
-
     public String getTitle() {
         return title;
     }
@@ -38,4 +41,11 @@ public class Note {
         return description;
     }
 
+    public int getPriority() {
+        return priority;
+    }
+
+    public void setPriority(int priority) {
+        this.priority = priority;
+    }
 }
