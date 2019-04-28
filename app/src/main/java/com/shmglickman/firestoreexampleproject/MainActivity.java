@@ -288,8 +288,10 @@ public class MainActivity extends AppCompatActivity {
     public void loadNotes(View view) {
         // For Read and Load All Multiply Notes
         noteBookRef.whereGreaterThanOrEqualTo("priority", 2)
-                .whereEqualTo("title", "Aa")
-                .orderBy("priority", Query.Direction.DESCENDING)
+//                .whereEqualTo("title", "Aa")
+//                .orderBy("priority", Query.Direction.DESCENDING)
+                .orderBy("priority")
+                .orderBy("title")
                 .limit(3)
                 .get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
