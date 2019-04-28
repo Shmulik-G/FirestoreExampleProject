@@ -288,6 +288,7 @@ public class MainActivity extends AppCompatActivity {
     public void loadNotes(View view) {
         // For Read and Load All Multiply Notes
         noteBookRef.whereGreaterThanOrEqualTo("priority", 2)
+                .whereEqualTo("title", "Aa")
                 .orderBy("priority", Query.Direction.DESCENDING)
                 .limit(3)
                 .get()
@@ -311,6 +312,12 @@ public class MainActivity extends AppCompatActivity {
                         }
 
                         textViewData.setText(data);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                       Log.d(TAG, e.toString());
                     }
                 });
     }
