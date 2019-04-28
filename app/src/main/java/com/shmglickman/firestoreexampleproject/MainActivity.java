@@ -11,6 +11,8 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -25,6 +27,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nullable;
@@ -108,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
                     Note note = documentSnapshot.toObject(Note.class);
                     note.setDocumentId(documentSnapshot.getId());
 
-                    String  documentId = note.getDocumentId();
+                    String documentId = note.getDocumentId();
                     String title = note.getTitle();
                     String description = note.getDescription();
                     int priority = note.getPriority();
@@ -287,41 +290,71 @@ public class MainActivity extends AppCompatActivity {
 
     public void loadNotes(View view) {
         // For Read and Load All Multiply Notes
-        noteBookRef.whereGreaterThanOrEqualTo("priority", 2)
+//        noteBookRef.whereGreaterThanOrEqualTo("priority", 2)
 //                .whereEqualTo("title", "Aa")
 //                .orderBy("priority", Query.Direction.DESCENDING)
+        Task task1 = noteBookRef.whereLessThan("priority", 2)
                 .orderBy("priority")
-                .orderBy("title")
+//                .orderBy("title")
                 .limit(3)
-                .get()
-                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                    @Override
-                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                        String data = "";
+                .get();
 
-                        for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                            Note note = documentSnapshot.toObject(Note.class);
-                            note.setDocumentId(documentSnapshot.getId());
+        Task task2 = noteBookRef.whereGreaterThan("priority", 2)
+                .orderBy("priority")
+                .get();
 
-                            String documentId = note.getDocumentId();
-                            String title = note.getTitle();
-                            String description = note.getDescription();
-                            int priority = note.getPriority();
+        Task<List<QuerySnapshot>> allTasks = Tasks.whenAllSuccess(task1, task2);
+        allTasks.addOnSuccessListener(new OnSuccessListener<List<QuerySnapshot>>() {
+            @Override
+            public void onSuccess(List<QuerySnapshot> querySnapshots) {
+                String data = "";
+                for (QuerySnapshot queryDocumentSnapshots : querySnapshots) {
+                    for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                        Note note = documentSnapshot.toObject(Note.class);
+                        note.setDocumentId(documentSnapshot.getId());
 
-                            data += "ID: " + documentId
-                                    + "\nTitle: " + title + "\nDescription: " + description
-                                    + "\nPriority: " + priority + "\n\n";
-                        }
+                        String documentId = note.getDocumentId();
+                        String title = note.getTitle();
+                        String description = note.getDescription();
+                        int priority = note.getPriority();
 
-                        textViewData.setText(data);
+                        data += "ID: " + documentId
+                                + "\nTitle: " + title + "\nDescription: " + description
+                                + "\nPriority: " + priority + "\n\n";
                     }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                       Log.d(TAG, e.toString());
-                    }
-                });
+                }
+
+                textViewData.setText(data);
+            }
+        });
+//                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+//                    @Override
+//                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+//                        String data = "";
+//
+//                        for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+//                            Note note = documentSnapshot.toObject(Note.class);
+//                            note.setDocumentId(documentSnapshot.getId());
+//
+//                            String documentId = note.getDocumentId();
+//                            String title = note.getTitle();
+//                            String description = note.getDescription();
+//                            int priority = note.getPriority();
+//
+//                            data += "ID: " + documentId
+//                                    + "\nTitle: " + title + "\nDescription: " + description
+//                                    + "\nPriority: " + priority + "\n\n";
+//                        }
+//
+//                        textViewData.setText(data);
+//                    }
+//                })
+//                .addOnFailureListener(new OnFailureListener() {
+//                    @Override
+//                    public void onFailure(@NonNull Exception e) {
+//                        Log.d(TAG, e.toString());
+//                    }
+//                });
     }
 
 
